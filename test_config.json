@@ -1,0 +1,27 @@
+{
+    "languages": [
+        {"name": "Go", "dir": "go", "startup_delay": 0.1},
+        {"name": "Rust", "dir": "rust", "startup_delay": 0.1},
+        {"name": "Elixir", "dir": "elixir", "startup_delay": 1}
+    ],
+    "tests": [
+        {
+            "name": "Basic",
+            "snr": [
+                ["REGISTER u p\n", "RESULT REGISTER 1\n"],
+                ["LOGIN u p\n", "RESULT LOGIN 1\n"],
+                ["CREATE c\n", "RESULT CREATE c 1\n"],
+                ["JOIN c\n", "RESULT JOIN c 1\n"],
+                ["SAY c m\n", "RESULT SAY c 1\nRECV u c m\n"],
+                ["CHANNELS\n", "RESULT CHANNELS c\n"]
+            ]
+        },
+        {
+            "name": "CreateWithoutLogin",
+            "snr": [
+                ["CREATE c\n", "RESULT CREATE c 1\n"],
+                ["CHANNELS\n", "RESULT CHANNELS c\n"]
+            ]
+        }
+    ]
+}
