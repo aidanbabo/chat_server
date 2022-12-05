@@ -22,6 +22,84 @@
                 ["CREATE c\n", "RESULT CREATE c 1\n"],
                 ["CHANNELS\n", "RESULT CHANNELS c\n"]
             ]
+        },
+
+
+
+        {
+            "name": "NoAccount",
+            "snr": [
+                ["LOGIN username password\n", "RESULT LOGIN 0\n"]
+            ]
+        },
+        {
+            "name": "WrongPassword",
+            "snr": [
+                ["REGISTER username password\n", "RESULT REGISTER 1\n"],
+                ["LOGIN username passwordn't\n", "RESULT LOGIN 0\n"]
+            ]
+        },
+        {
+            "name": "ChannelsNotLoggedIn",
+            "snr": [
+                ["CHANNELS\n", "RESULT CHANNELS\n"]
+            ]
+        },
+        {
+            "name": "ChannelAlreadyExists",
+            "snr": [
+                ["CREATE channel\n", "RESULT CREATE channel 1\n"],
+                ["CREATE channel\n", "RESULT CREATE channel 0\n"]
+            ]
+        },
+        {
+            "name": "JoinNotLoggedIn",
+            "snr": [
+                ["CREATE channel\n", "RESULT CREATE channel 1\n"],
+                ["JOIN channel\n", "RESULT JOIN channel 0\n"]
+            ]
+        },
+        {
+            "name": "JoinNoSuchChannel",
+            "snr": [
+                ["REGISTER username password\n", "RESULT REGISTER 1\n"],
+                ["LOGIN username password\n", "RESULT LOGIN 1\n"],
+                ["JOIN channel\n", "RESULT JOIN channel 0\n"]
+            ]
+        },
+        {
+            "name": "JoinChannelAlreadyMember",
+            "snr": [
+                ["REGISTER username password\n", "RESULT REGISTER 1\n"],
+                ["LOGIN username password\n", "RESULT LOGIN 1\n"],
+                ["CREATE channel\n", "RESULT CREATE channel 1\n"],
+                ["JOIN channel\n", "RESULT JOIN channel 1\n"],
+                ["JOIN channel\n", "RESULT JOIN channel 0\n"]
+            ]
+        },
+        {
+            "name": "SayNotLoggedIn",
+            "snr": [
+                ["CREATE channel\n", "RESULT CREATE channel 1\n"],
+                ["SAY channel Here is the message.\n", "RESULT SAY channel 0\n"]
+            ]
+        },
+        {
+            "name": "SayNoSuchChannel",
+            "snr": [
+                ["REGISTER username password\n", "RESULT REGISTER 1\n"],
+                ["LOGIN username password\n", "RESULT LOGIN 1\n"],
+                ["SAY channel Here is the message.\n", "RESULT SAY channel 0\n"]
+            ]
+        },
+        {
+            "name": "SayNotChannelMember",
+            "snr": [
+                ["REGISTER username password\n", "RESULT REGISTER 1\n"],
+                ["LOGIN username password\n", "RESULT LOGIN 1\n"],
+                ["CREATE channel\n", "RESULT CREATE channel 1\n"],
+                ["SAY channel Here is the message.\n", "RESULT SAY channel 0\n"]
+            ]
         }
     ]
 }

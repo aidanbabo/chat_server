@@ -157,7 +157,8 @@ defmodule ChatServer.Connection do
 
   defp join(state, channel) do
     result =
-      if ChatServer.Channels.exists?(channel) and client_logged_in?(state) do
+      if ChatServer.Channels.exists?(channel) and client_logged_in?(state) and
+           not client_channel_member?(channel) do
         Registry.register(ChatServer.ChannelRegistry, channel, state.name)
         1
       else
@@ -170,9 +171,11 @@ defmodule ChatServer.Connection do
 
   defp say(state, channel, message) do
     result =
-      if ChatServer.Channels.exists?(channel) and client_logged_in?(state) do
+      if ChatServer.Channels.exists?(channel) and client_logged_in?(state) and
+           client_channel_member?(channel) do
         message = "RECV #{state.name} #{channel} #{message}\n"
 
+        # @Todo Tasks?
         Registry.dispatch(ChatServer.ChannelRegistry, channel, fn entries ->
           for {pid, _username} <- entries do
             ChatServer.Connection.send(pid, message)
@@ -190,5 +193,13 @@ defmodule ChatServer.Connection do
 
   defp client_logged_in?(state) do
     state.type == :client and state.name != nil
+  end
+
+  defp client_channel_member?(channel) do
+    Registry.lookup(ChatServer.ChannelRegistry, channel)
+    |> Enum.any?(fn
+      {pid, _name} when pid == self() -> true
+      _ -> false
+    end)
   end
 end
