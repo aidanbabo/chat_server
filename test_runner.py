@@ -54,8 +54,6 @@ def client(test, addr):
 
 
 def run_test(lang, test):
-    subprocess.run(["make", "test_server"],
-                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     server = subprocess.Popen(["./chat_server", "0"],
                               stdout=subprocess.PIPE)
     try:
@@ -74,9 +72,21 @@ def run_tests(lang, tests):
 
     # Shouldn't raise, just being safe, you can never know :(
     try:
+        if ARGS.v:
+            print("Building the Server...", end="", flush=True)
+        proc = subprocess.run(["make", "test_server"],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if proc.returncode != 0:
+            print("FAILED >:(")
+            print(proc.stderr.decode())
+            exit(1)
+
+        if ARGS.v:
+            print("Built")
+
         for test in tests:
             if ARGS.v:
-                print(f"\tRunning test: {test['name']}...", end="")
+                print(f"\tRunning test: {test['name']}...", end="", flush=True)
             ok, msg = run_test(lang, test)
             if not ok:
                 if ARGS.v:
