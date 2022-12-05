@@ -738,6 +738,9 @@ async fn main() {
     let server = Arc::new(Server::new(port));
     let listener = TcpListener::bind(("127.0.0.1", server.port)).await.unwrap();
 
+    // For testing
+    println!("{}", listener.local_addr().unwrap());
+
     let (task_send, mut task_recv) = mpsc::channel(1);
     let (shutdown_send, _) = broadcast::channel(1);
 

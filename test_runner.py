@@ -2,7 +2,6 @@ import argparse
 import json
 import socket
 import subprocess
-import time
 import os
 
 
@@ -43,26 +42,27 @@ def send_and_recv(sock, snd, rcv):
     return recv(sock, rcv)
 
 
-def client(test):
-    with socket.create_connection(("localhost", 8000)) as sock:
+def client(test, addr):
+    [_, port] = addr.rsplit(":", 1)
+    with socket.create_connection(("localhost", int(port))) as sock:
         sock.settimeout(5)
         for i, [s, r] in enumerate(test["snr"]):
             ok, msg = send_and_recv(sock, s.encode(), r.encode())
             if not ok:
-                return False, f"Test {test['name']} failed on line {i+1}: {msg}"
+                return False, f"Test {test['name']} failed on cmd {i+1}: {msg}"
     return True, "Test Passed!"
 
 
 def run_test(lang, test):
     subprocess.run(["make", "test_server"],
                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    server = subprocess.Popen(["./chat_server", "8000"],
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    # Shouldn't raise, but just in case lets have it shut the server down
+    server = subprocess.Popen(["./chat_server", "0"],
+                              stdout=subprocess.PIPE)
     try:
-        time.sleep(lang["startup_delay"])
-        ok, msg = client(test)
+        addr = next(server.stdout).decode().strip()
+        ok, msg = client(test, addr)
+    except StopIteration:
+        return False, "Failed to read server address from standard out"
     finally:
         server.terminate()
 
@@ -71,11 +71,19 @@ def run_test(lang, test):
 
 def run_tests(lang, tests):
     os.chdir(lang["dir"])
+
+    # Shouldn't raise, just being safe, you can never know :(
     try:
         for test in tests:
+            if ARGS.v:
+                print(f"\tRunning test: {test['name']}...", end="")
             ok, msg = run_test(lang, test)
             if not ok:
+                if ARGS.v:
+                    print("FAILED DDDDDD:<<<<")
                 return False, msg
+            elif ARGS.v:
+                print("Passed :D")
     finally:
         os.chdir("..")
     return True, "Passed!"
@@ -83,15 +91,18 @@ def run_tests(lang, tests):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("-v", action="store_true")
     parser.add_argument("-lang", action="append")
     parser.add_argument("-filter")
-    args = parser.parse_args()
+    global ARGS
+    ARGS = parser.parse_args()
 
     with open("test_config.json") as f:
         config = json.load(f)
 
     for lang in config["languages"]:
-        if args.lang is None or lang["name"] in args.lang:
+        if ARGS.lang is None or lang["name"] in ARGS.lang:
+            print(f"Running {lang['name']} tests...")
             ok, msg = run_tests(lang, config["tests"])
             print(f"{lang['name']}: {msg}")
             if not ok:

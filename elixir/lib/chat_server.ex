@@ -15,6 +15,10 @@ defmodule ChatServer do
     {:ok, socket} =
       :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
 
+    # For testing
+    {:ok, port} = :inet.port(socket)
+    IO.puts("localhost:#{port}")
+
     Logger.info("Accepting connections on port #{port}")
     loop_acceptor(socket)
   end

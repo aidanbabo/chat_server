@@ -1,8 +1,8 @@
 {
     "languages": [
-        {"name": "Go", "dir": "go", "startup_delay": 0.1},
-        {"name": "Rust", "dir": "rust", "startup_delay": 0.1},
-        {"name": "Elixir", "dir": "elixir", "startup_delay": 1}
+        {"name": "Go", "dir": "go"},
+        {"name": "Rust", "dir": "rust"},
+        {"name": "Elixir", "dir": "elixir"}
     ],
     "tests": [
         {

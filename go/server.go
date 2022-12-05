@@ -285,6 +285,10 @@ func Run(s *Server) {
 
 func RunWithConfig(s *Server, config string) {
 	ln, err := net.Listen("tcp", ":"+s.port)
+
+	// For testing
+	fmt.Println(ln.Addr().String())
+
 	if err != nil {
 		log.Fatalln("Failed to start TCP server: " + err.Error())
 	}
